@@ -2,8 +2,6 @@
 #
 # pfetch - Simple POSIX sh fetch script.
 
-#PF_ASCII="arch"
-
 # Wrapper around all escape sequences used by pfetch to allow for
 # greater control over which sequences are used (if any at all).
 esc() {
@@ -294,6 +292,7 @@ get_os() {
                 distro="$distro on Windows 10 [WSL1]"
             fi
         ;;
+
         (MSYS*|MINGW*|Windows_NT)
             # Grab everything after the first instance of
             # white-space in the command output of 'wmic'.
@@ -421,13 +420,16 @@ get_kernel() {
         (*BSD*|Haiku|Minix)
             return
         ;;
+
         # Use wmic to get the OS version
         (MSYS*|MINGW*|Windows_NT)
             kernel=$(wmic OS get Version)
             kernel=$(echo $kernel | awk '{print $3}')
         ;;
+
         (CYGWIN*)
             kernel=$(uname -r)
+        ;;
     esac
 
     # '$kernel' is the cached output of 'uname -r'.
@@ -643,12 +645,10 @@ get_pkgs() {
 
             (CYGWIN*)
                 cygcheck -cd
-
             ;;
 
             (MSYS*)
                 pacman -Qq
-
             ;;
 
             (Darwin*)
@@ -738,7 +738,7 @@ get_pkgs() {
         # which needs to be stripped.
         (OpenBSD)
             packages=$((packages))
-		    ;;
+        ;;
     esac
 
     case $packages in
