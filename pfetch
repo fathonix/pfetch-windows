@@ -302,17 +302,18 @@ get_os() {
             #
             # This extracts:    ^^^^^^^^^^^^^^^^^^^^
             read -r _ distro <<-EOF
-                $(wmic os get Caption | head -n 2 | tail -n +2)
+                $(wmic OS get Caption | head -n 2 | tail -n +2)
 			EOF
         ;;
+
         (CYGWIN*)
             # Save Cygwin output for OS using uname.
-            #
             distro_cygwin=$(echo $os | grep CYGWIN_)
             if [ ! -z "${distro_cygwin}" ] ; then
               distro=$(uname -o)
             fi
         ;;
+
         (Darwin*)
             # Parse the SystemVersion.plist file to grab the macOS
             # version. The file is in the following format:
@@ -532,7 +533,7 @@ get_uptime() {
             # BusyBox for Windows does not have a "true" pseudo
             # filesystem, unlike MSYS and Cygwin. Instead, get
             # those data from wmic.
-            s=$(wmic path Win32_OperatingSystem get LastBootUpTime \
+            s=$(wmic OS get LastBootUpTime \
             | tail -n +2 \
             | sed 's/\(.*\)\(..\)\..*/\1.\2/'
             )
@@ -795,8 +796,10 @@ get_memory() {
         ;;
 
         (Windows_NT)
-            mem_full=$(wmic OS get TotalVisibleMemorySize | tail -n +2)
-            mem_avail=$(wmic OS get FreePhysicalMemory | tail -n +2)
+            read -r mem_avail mem_full <<-EOF
+                $(wmic OS get TotalVisibleMemorySize,FreePhysicalMemory \
+                | tail -n +2)
+			EOF
 
             mem_used=$(((mem_full - mem_avail) / 1024))
             mem_full=$((mem_full / 1024))
